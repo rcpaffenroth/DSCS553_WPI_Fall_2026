@@ -179,7 +179,6 @@ def validate_hf_token(hf_token):
     except Exception:
         return (
             "The token could not be validated. "
-            "Check the token and the VM's internet connection."
         )
     
 with gr.Blocks(css=fancy_css) as demo:
