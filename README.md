@@ -2,9 +2,21 @@ An example chatbot using [Gradio](https://gradio.app), [`huggingface_hub`](https
 
 ## Scripts
 
+### `create_files.sh`
+
+A simple script to automatically create 10 empty files.
+
+Run:
+
+```bash
+./create_files.sh
+```
+
 ### `connect_student_admin.sh`
 
 Connects to a given VM/LXC container using the original shared ssh key.
+
+Run:
 
 ```bash
 ./connect_student_admin.sh
