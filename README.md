@@ -14,7 +14,7 @@ Run:
 
 ### `connect_student_admin.sh`
 
-Connects to a given VM/LXC container using the original shared ssh key.
+Connects to a given VM/LXC container using the original shared SSH key.
 
 Run:
 
