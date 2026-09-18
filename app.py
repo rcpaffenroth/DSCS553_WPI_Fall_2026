@@ -11,7 +11,7 @@ pipe = pipeline(
     "text-generation",
     model=LOCAL_MODEL,
     dtype="auto",
-    device="cuda",
+    device="cpu",
 )
 
 
