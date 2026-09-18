@@ -52,8 +52,7 @@ echo "checking that the authorized_keys file is correct"
 ssh -p ${PORT} -o StrictHostKeyChecking=no student-admin@${MACHINE} "cat ~/.ssh/authorized_keys"
 
 # clone the repo
-git clone https://github.com/rcpaffenroth/DSCS553_WPI_Fall_2026
-
+git clone --branch case_study_2 --single-branch https://github.com/rcpaffenroth/DSCS553_WPI_Fall_2026.git DSCS553_example
 # Copy the files to the server
 scp -P ${PORT} -o StrictHostKeyChecking=no -r DSCS553_example student-admin@${MACHINE}:~/
 
