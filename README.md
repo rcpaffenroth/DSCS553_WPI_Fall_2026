@@ -4,7 +4,7 @@ An example chatbot using [Gradio](https://gradio.app), [`huggingface_hub`](https
 
 ### `connect_student_admin.sh`
 
-Connects to a VM using the original shared ssh key.
+Connects to a given VM/LXC container using the original shared ssh key.
 
 ```bash
 ./connect_student_admin.sh
@@ -15,10 +15,9 @@ Connects to a VM using the original shared ssh key.
 Initial deployment:
 
 - Removes an old saved SSH host key.
-- Creates `tmp/` and copies the original course SSH key into it.
+- Creates `tmp/` and copies the original SSH key into it.
 - Generates the new personal key `tmp/mykey`.
-- Installs the new public key on the container while retaining the original
-  course key.
+- Installs the new public key on the container while either retaining or replacing the original SSH key.
 - Clones the `case_study_2` Git branch.
 - Copies the repository to the container as `~/DSCS553_example`.
 
@@ -44,6 +43,6 @@ Run:
 ./deploy_second_part.sh
 ```
 
-Application output is stored in `~/log.txt` on the container.
+Application output is stored in `~/log.txt` on the virtual machine.
 
 The Gradio application runs on port `7860` inside the container. Access it through the respective http port or an SSH tunnel.
