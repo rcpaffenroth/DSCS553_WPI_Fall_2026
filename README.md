@@ -55,6 +55,6 @@ Run:
 ./deploy_second_part.sh
 ```
 
-Application output is stored in `~/log.txt` on the virtual machine.
+Application output is stored in `~/log.txt` on the container.
 
 The Gradio application runs on port `7860` inside the container. Access it through the respective http port or an SSH tunnel.
