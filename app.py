@@ -1,10 +1,11 @@
 import gradio as gr
-import spaces
 from huggingface_hub import InferenceClient
 from transformers import pipeline
 
+
 LOCAL_MODEL = "Qwen/Qwen3-0.6B"
 REMOTE_MODEL = "openai/gpt-oss-20b"
+
 
 pipe = pipeline(
     "text-generation",
@@ -12,6 +13,7 @@ pipe = pipeline(
     dtype="auto",
     device="cuda",
 )
+
 
 fancy_css = """
 .gradio-container {
@@ -50,7 +52,7 @@ fancy_css = """
 """
 
 
-@spaces.GPU
+# Removed @spaces.GPU
 def local_generate(
     messages,
     max_tokens,
@@ -76,7 +78,7 @@ def respond(
     temperature,
     top_p,
     use_local_model,
-    hf_token: gr.OAuthToken,
+    hf_token,  # Now an ordinary string
 ):
     messages = [{"role": "system", "content": system_message}]
     messages.extend(history)
@@ -97,12 +99,12 @@ def respond(
 
     print("[MODE] api")
 
-    if hf_token is None or not getattr(hf_token, "token", None):
-        yield "⚠️ Please log in with your Hugging Face account first."
+    if not hf_token:
+        yield "⚠️ Please enter your Hugging Face token first."
         return
 
     client = InferenceClient(
-        token=hf_token.token,
+        token=hf_token,
         model=REMOTE_MODEL,
     )
 
@@ -157,21 +159,24 @@ chatbot = gr.ChatInterface(
             label="Use Local Model",
             value=False,
         ),
+        # Replaces gr.LoginButton and gr.OAuthToken
+        gr.Textbox(
+            label="Hugging Face Token",
+            placeholder="hf_...",
+            type="password",
+        ),
     ],
 )
 
 
 with gr.Blocks(css=fancy_css) as demo:
-    with gr.Sidebar():
-        gr.LoginButton()
-
     gr.Markdown(
         "# 🌟 Effective AI Chatbot",
         elem_id="app-title",
     )
 
     gr.Markdown(
-        "A fancier version of the standard Huggging Face chatbot template.",
+        "A fancier version of the standard Hugging Face chatbot template.",
         elem_id="app-subtitle",
     )
 
@@ -179,10 +184,14 @@ with gr.Blocks(css=fancy_css) as demo:
         chatbot.render()
 
         gr.Markdown(
-            "Use **Additional inputs** to switch between the API model and the locally executed model.",
+            "Use **Additional inputs** to switch between the API model "
+            "and the locally executed model.",
             elem_id="model-note",
         )
 
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=7860,
+    )
