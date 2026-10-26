@@ -1,7 +1,15 @@
+import time
 import gradio as gr
 from huggingface_hub import InferenceClient
 from transformers import pipeline
 from huggingface_hub import HfApi, InferenceClient
+from prometheus_client import start_http_server, Counter, Summary
+
+# --- Prometheus metrics ---
+REQUEST_COUNTER = Counter('app_requests_total', 'Total number of requests')
+SUCCESSFUL_REQUESTS = Counter('app_successful_requests_total', 'Total number of successful requests')
+FAILED_REQUESTS = Counter('app_failed_requests_total', 'Total number of failed requests')
+REQUEST_DURATION = Summary('app_request_duration_seconds', 'Time spent processing request')
 
 LOCAL_MODEL = "Qwen/Qwen3-0.6B"
 REMOTE_MODEL = "openai/gpt-oss-20b"
@@ -80,51 +88,63 @@ def respond(
     use_local_model,
     hf_token,  # Now an ordinary string
 ):
-    messages = [{"role": "system", "content": system_message}]
-    messages.extend(history)
-    messages.append({"role": "user", "content": message})
+    REQUEST_COUNTER.inc()
+    start_t = time.perf_counter()
+    try:
+        messages = [{"role": "system", "content": system_message}]
+        messages.extend(history)
+        messages.append({"role": "user", "content": message})
 
-    if use_local_model:
-        print("[MODE] local")
+        if use_local_model:
+            print("[MODE] local")
 
-        response = local_generate(
-            messages,
-            max_tokens,
-            temperature,
-            top_p,
+            response = local_generate(
+                messages,
+                max_tokens,
+                temperature,
+                top_p,
+            )
+
+            SUCCESSFUL_REQUESTS.inc()
+            yield response
+            return
+
+        print("[MODE] api")
+
+        if not hf_token:
+            FAILED_REQUESTS.inc()
+            yield "⚠️ Please enter your Hugging Face token first."
+            return
+
+        client = InferenceClient(
+            token=hf_token,
+            model=REMOTE_MODEL,
         )
 
-        yield response
-        return
+        response = ""
 
-    print("[MODE] api")
+        for chunk in client.chat_completion(
+            messages,
+            max_tokens=max_tokens,
+            stream=True,
+            temperature=temperature,
+            top_p=top_p,
+        ):
+            choices = chunk.choices
+            token = ""
 
-    if not hf_token:
-        yield "⚠️ Please enter your Hugging Face token first."
-        return
+            if len(choices) and choices[0].delta.content:
+                token = choices[0].delta.content
 
-    client = InferenceClient(
-        token=hf_token,
-        model=REMOTE_MODEL,
-    )
+            response += token
+            yield response
 
-    response = ""
-
-    for chunk in client.chat_completion(
-        messages,
-        max_tokens=max_tokens,
-        stream=True,
-        temperature=temperature,
-        top_p=top_p,
-    ):
-        choices = chunk.choices
-        token = ""
-
-        if len(choices) and choices[0].delta.content:
-            token = choices[0].delta.content
-
-        response += token
-        yield response
+        SUCCESSFUL_REQUESTS.inc()
+    except Exception as e:
+        FAILED_REQUESTS.inc()
+        yield f"Error: {e}"
+    finally:
+        REQUEST_DURATION.observe(time.perf_counter() - start_t)
 
 
 chatbot = gr.ChatInterface(
@@ -274,6 +294,8 @@ with gr.Blocks(css=fancy_css) as demo:
 
 
 if __name__ == "__main__":
+    # Expose Prometheus metrics at :8000/metrics
+    start_http_server(8000)
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
