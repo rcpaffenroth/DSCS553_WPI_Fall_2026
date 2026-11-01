@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE="simeonkr/dscs553-case4:2026"
+IMAGE="simeonkr/dscs553-case4"
 SERVICE_NAME="ds553-case4-2026"
 REGION="us-central1"
 PORT="7860"
@@ -35,3 +35,8 @@ echo "Service name:  $SERVICE_NAME"
 echo "Region:        $REGION"
 echo "Memory:        $MEMORY per instance"
 echo "Public URL:    $SERVICE_URL"
+
+
+
+
+
