@@ -1,60 +1,29 @@
 An example chatbot using [Gradio](https://gradio.app), [`huggingface_hub`](https://huggingface.co/docs/huggingface_hub/v0.22.2/en/index), and the [Hugging Face Inference API](https://huggingface.co/docs/api-inference/index).
 
-## Scripts
+# Case Study 3: Docker and Monitoring
 
-### `create_files.sh`
+This repository contains a chatbot application and the files needed to run it in Docker and monitor it with Prometheus and Grafana.
 
-A simple script to automatically create 10 empty files.
+## Dockerfile
 
-Run:
+A Dockerfile contains instructions for building a Docker image. The main `Dockerfile` installs the application's dependencies and Node Exporter, then starts the chatbot and Node Exporter together in one container.
 
-```bash
-./create_files.sh
-```
+The chatbot uses port **7860**, the application's metrics use **8000**, and Node Exporter provides system metrics on **9100**.
 
-### `connect_student_admin.sh`
+## Prometheus folder
 
-Connects to a given VM/LXC container using the original shared SSH key.
+This folder contains:
 
-Run:
+- `Dockerfile`: Builds an image for the Prometheus server.
+- `prometheus.yml`: Tells Prometheus where to collect the application and system metrics.
 
-```bash
-./connect_student_admin.sh
-```
+Prometheus collects and stores these metrics so they can be viewed over time. Its web interface uses port **9090**.
 
-### `deploy_first_part.sh`
+## Grafana folder
 
-Initial deployment:
+This folder contains a `Dockerfile` for running Grafana. Connect Grafana to the Prometheus server to create dashboards showing the collected metrics. Grafana uses port **3000**.
 
-- Removes an old saved SSH host key.
-- Creates `tmp/` and copies the original SSH key into it.
-- Generates the new personal key `tmp/mykey`.
-- Installs the new public key on the container while either retaining or replacing the original SSH key.
-- Clones the `case_study_2` Git branch.
-- Copies the repository to the container as `~/DSCS553_example`.
+## Application files
 
-Run:
-
-```bash
-./deploy_first_part.sh
-```
-
-### `deploy_second_part.sh`
-
-Finishes deployment on the container:
-
-- Connects using `tmp/mykey`.
-- Installs `python3-venv`.
-- Creates the Python virtual environment.
-- Installs `requirements.txt`.
-- Starts `app.py` with `nohup`.
-
-Run:
-
-```bash
-./deploy_second_part.sh
-```
-
-Application output is stored in `~/log.txt` on the container.
-
-The Gradio application runs on port `7860` inside the container. Access it through the respective http port or an SSH tunnel.
+- `app.py`: The chatbot application, including its Prometheus metrics.
+- `requirements.txt`: The Python packages needed by the application.
