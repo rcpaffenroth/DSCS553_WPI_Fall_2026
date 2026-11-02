@@ -75,7 +75,8 @@ Turing has several GPU generations available. Hardware evolves over time, but cu
 | **L40S** | Standard ML workloads, good balance |
 | **A100** | High-memory, compute-intensive work |
 | **H100** | State-of-the-art performance |
-| **H200** | Newest, maximum memory |
+| **H200** | State-of-the-art performance, large memory |
+| **RTX6000B** | Newest, maximum memory |
 
 Specify GPU type in SLURM scripts or accept the default allocation.
 
