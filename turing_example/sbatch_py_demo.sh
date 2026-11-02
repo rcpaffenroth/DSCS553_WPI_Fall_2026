@@ -17,6 +17,6 @@
 # Get a node for more general use.
 
 # Run a python program using our local virtual environment
-cd /home/rcpaffenroth/tmp/DSCS553_example/turing_example
+cd //home/rcpaffenroth/projects/1_classes/DSCS553_WPI_Fall_2026/turing_example
 venv/bin/python quickstart_tutorial.py
 

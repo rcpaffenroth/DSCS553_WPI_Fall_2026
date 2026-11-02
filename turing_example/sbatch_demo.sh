@@ -18,4 +18,4 @@
 
 # Run a python program using our local virtual environment
 # /home/rcpaffenroth/DS553/venv/bin/python /home/rcpaffenroth/DS553/demo.py
-/home/rcpaffenroth/tmp/DSCS553_example/turing_example/venv/bin/python /home/rcpaffenroth/tmp/DSCS553_example/turing_example/pytorchUsingGPU.py
+/home/rcpaffenroth/projects/1_classes/DSCS553_WPI_Fall_2026/turing_example/venv/bin/python /home/rcpaffenroth/tmp/DSCS553_example/turing_example/pytorchUsingGPU.py
