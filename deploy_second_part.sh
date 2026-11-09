@@ -11,7 +11,7 @@ eval "$(ssh-agent -s)"
 ssh-add mykey
 
 # check that the code in installed and start up the product
-COMMAND="ssh -i tmp/mykey -p ${PORT} -o StrictHostKeyChecking=no student-admin@${MACHINE}"
+COMMAND="ssh -i mykey -p ${PORT} -o StrictHostKeyChecking=no student-admin@${MACHINE}"
 
 ${COMMAND} "ls DSCS553_example"
 ${COMMAND} "sudo apt install -qq -y python3-venv"
