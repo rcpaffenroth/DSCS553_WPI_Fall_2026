@@ -1,7 +1,7 @@
 import time
 import gradio as gr
 from huggingface_hub import InferenceClient
-from transformers import pipeline
+# from transformers import pipeline
 from huggingface_hub import HfApi, InferenceClient
 from prometheus_client import start_http_server, Counter, Summary
 
@@ -11,16 +11,16 @@ SUCCESSFUL_REQUESTS = Counter('app_successful_requests_total', 'Total number of 
 FAILED_REQUESTS = Counter('app_failed_requests_total', 'Total number of failed requests')
 REQUEST_DURATION = Summary('app_request_duration_seconds', 'Time spent processing request')
 
-LOCAL_MODEL = "Qwen/Qwen3-0.6B"
+# LOCAL_MODEL = "Qwen/Qwen3-0.6B"
 REMOTE_MODEL = "openai/gpt-oss-20b"
 
 
-pipe = pipeline(
-    "text-generation",
-    model=LOCAL_MODEL,
-    dtype="auto",
-    device="cpu",
-)
+# pipe = pipeline(
+#     "text-generation",
+#     model=LOCAL_MODEL,
+#     dtype="auto",
+#     device="cpu",
+# )
 
 
 fancy_css = """
@@ -61,21 +61,21 @@ fancy_css = """
 
 
 # Removed @spaces.GPU
-def local_generate(
-    messages,
-    max_tokens,
-    temperature,
-    top_p,
-):
-    outputs = pipe(
-        messages,
-        max_new_tokens=max_tokens,
-        do_sample=True,
-        temperature=temperature,
-        top_p=top_p,
-    )
+# def local_generate(
+#     messages,
+#     max_tokens,
+#     temperature,
+#     top_p,
+# ):
+#     outputs = pipe(
+#         messages,
+#         max_new_tokens=max_tokens,
+#         do_sample=True,
+#         temperature=temperature,
+#         top_p=top_p,
+#     )
 
-    return outputs[0]["generated_text"][-1]["content"]
+#     return outputs[0]["generated_text"][-1]["content"]
 
 
 def respond(
@@ -85,8 +85,8 @@ def respond(
     max_tokens,
     temperature,
     top_p,
-    use_local_model,
-    hf_token,  # Now an ordinary string
+    # use_local_model,
+    hf_token,  
 ):
     REQUEST_COUNTER.inc()
     start_t = time.perf_counter()
@@ -95,19 +95,19 @@ def respond(
         messages.extend(history)
         messages.append({"role": "user", "content": message})
 
-        if use_local_model:
-            print("[MODE] local")
+        # if use_local_model:
+        #     print("[MODE] local")
 
-            response = local_generate(
-                messages,
-                max_tokens,
-                temperature,
-                top_p,
-            )
+        #     response = local_generate(
+        #         messages,
+        #         max_tokens,
+        #         temperature,
+        #         top_p,
+        #     )
 
-            SUCCESSFUL_REQUESTS.inc()
-            yield response
-            return
+        #     SUCCESSFUL_REQUESTS.inc()
+        #     yield response
+        #     return
 
         print("[MODE] api")
 
@@ -175,10 +175,10 @@ chatbot = gr.ChatInterface(
             step=0.05,
             label="Top-p (nucleus sampling)",
         ),
-        gr.Checkbox(
-            label="Use Local Model",
-            value=False,
-        ),
+        # gr.Checkbox(
+        #     label="Use Local Model",
+        #     value=False,
+        # ),
         # Replaces gr.LoginButton and gr.OAuthToken
         gr.Textbox(
             label="Hugging Face Token",
@@ -200,7 +200,7 @@ def validate_hf_token(hf_token):
         return (
             "The token could not be validated. "
         )
-    
+
 with gr.Blocks(css=fancy_css) as demo:
     gr.Markdown(
         "# 🌟 Effective AI Chatbot",
@@ -258,10 +258,10 @@ with gr.Blocks(css=fancy_css) as demo:
             label="Top-p (nucleus sampling)",
         )
 
-        use_local_model = gr.Checkbox(
-            label="Use Local Model",
-            value=False,
-        )
+        # use_local_model = gr.Checkbox(
+        #     label="Use Local Model",
+        #     value=False,
+        # )
 
     with gr.Column(elem_id="chat-container"):
         chatbot_component = gr.Chatbot()
@@ -274,16 +274,16 @@ with gr.Blocks(css=fancy_css) as demo:
                 max_tokens,
                 temperature,
                 top_p,
-                use_local_model,
+                # use_local_model,
                 hf_token,
             ],
         )
 
-        gr.Markdown(
-            "Use **Additional inputs** to switch between the API model "
-            "and the locally executed model.",
-            elem_id="model-note",
-        )
+        # gr.Markdown(
+        #     "Use **Additional inputs** to switch between the API model "
+        #     "and the locally executed model.",
+        #     elem_id="model-note",
+        # )
 
     validate_button.click(
         fn=validate_hf_token,
